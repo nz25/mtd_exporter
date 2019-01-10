@@ -199,7 +199,9 @@ class StandardLayout:
         current_row = 1
 
         # top annotation
-        annotations = [a for a in self.table.top_annotations if a]
+        annotations = [sub
+            for a in self.table.top_annotations
+            for sub in a.split('\n') if a]
         if annotations:
             self.top_annotation = Range(current_row, 1, len(annotations), 1)
             current_row = self.top_annotation.x2 + 2
@@ -243,7 +245,9 @@ class StandardLayout:
             self.data = None
 
         # bottom annotations
-        annotations = [a for a in self.table.bottom_annotations if a]
+        annotations = [sub
+            for a in self.table.bottom_annotations
+            for sub in a.split('\n') if a]
         if annotations:
             self.bottom_annotation = Range(current_row, 1, current_row + len(annotations) - 1, 1)
             current_row = self.bottom_annotation.x2 + 1
@@ -255,12 +259,16 @@ class StandardContent:
     def __init__(self, table):
          
         self.table = table
-        self.top_annotation = [[a] for a in self.table.top_annotations if a] if table.top_annotations else None
+        self.top_annotation = [[sub]
+            for a in self.table.top_annotations
+            for sub in a.split('\n') if a] if table.top_annotations else None
         self.back_to_content = None
         self.top_banner = [[cell.label for cell in row] for row in self.table.top_banner.banner] if table.top_banner else None
         self.side_banner = [[cell.label for cell in row] for row in self.table.side_banner.banner] if table.side_banner else None
         self.data = self.table.data if self.table.data else None
-        self.bottom_annotation = [[a] for a in self.table.bottom_annotations if a] if table.bottom_annotations else None
+        self.bottom_annotation = [[sub]
+            for a in self.table.bottom_annotations
+            for sub in a.split('\n') if a] if table.bottom_annotations else None
 
 class StandardStyles:
 
