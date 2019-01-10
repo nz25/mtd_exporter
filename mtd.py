@@ -50,13 +50,8 @@ class Table:
         self.annotations = []
         for n in xml_node.find('Annotations'):
             annotation_text = n.get('Text')
-            # if annotation text starts end ends with html tags
-            if '<script' in annotation_text:
-                #parse html
-                parser = AnnotationParser(annotation_text)
-                self.annotations.append(parser.text)
-            else:
-                self.annotations.append(annotation_text)
+            parser = AnnotationParser(annotation_text)
+            self.annotations.append(parser.text)
 
         # cell values - only from the 1st layer, because
         # layers are not current supported in TOM
@@ -423,15 +418,23 @@ class AnnotationParser(HTMLParser):
 
     def __init__(self, html):
         HTMLParser.__init__(self)
-        self.data = []
+        self.text = ''
+        self.ignore = False
         self.feed(html)
 
-    def handle_data(self, data):
-        self.data.append(data)
+    def handle_starttag(self, tag, attrs):
+        if tag == 'br':
+            self.text += '\n'
+        elif tag == 'script':
+            self.ignore = True
 
-    @property
-    def text(self):
-        return self.data[-1] if self.data else ''
+    def handle_endtag(self, tag):
+        if tag == 'script':
+            self.ignore = False
+
+    def handle_data(self, data):
+        if not self.ignore:
+            self.text += data
 
 class Partitioner:
 
